@@ -1,14 +1,15 @@
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-import numpy as np
+
 from utils import init_weights
+
 
 class DownConvBlock(nn.Module):
     """
     A block of three convolutional layers where each layer is followed by a non-linear activation function
     Between each block we add a pooling operation.
     """
+
     def __init__(self, input_dim, output_dim, initializers, padding, pool=True):
         super(DownConvBlock, self).__init__()
         layers = []
@@ -36,6 +37,7 @@ class UpConvBlock(nn.Module):
     A block consists of an upsampling layer followed by a convolutional layer to reduce the amount of channels and then a DownConvBlock
     If bilinear is set to false, we do a transposed convolution instead of upsampling
     """
+
     def __init__(self, input_dim, output_dim, initializers, padding, bilinear=True):
         super(UpConvBlock, self).__init__()
         self.bilinear = bilinear
@@ -51,9 +53,9 @@ class UpConvBlock(nn.Module):
             up = nn.functional.interpolate(x, mode='bilinear', scale_factor=2, align_corners=True)
         else:
             up = self.upconv_layer(x)
-        
+
         assert up.shape[3] == bridge.shape[3]
         out = torch.cat([up, bridge], 1)
-        out =  self.conv_block(out)
+        out = self.conv_block(out)
 
         return out

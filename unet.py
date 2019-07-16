@@ -1,5 +1,5 @@
 from unet_blocks import *
-import torch.nn.functional as F
+
 
 class Unet(nn.Module):
     """
@@ -42,27 +42,26 @@ class Unet(nn.Module):
 
         if self.apply_last_layer:
             self.last_layer = nn.Conv2d(output, num_classes, kernel_size=1)
-            #nn.init.kaiming_normal_(self.last_layer.weight, mode='fan_in',nonlinearity='relu')
-            #nn.init.normal_(self.last_layer.bias)
-
+            # nn.init.kaiming_normal_(self.last_layer.weight, mode='fan_in',nonlinearity='relu')
+            # nn.init.normal_(self.last_layer.bias)
 
     def forward(self, x, val):
         blocks = []
         for i, down in enumerate(self.contracting_path):
             x = down(x)
-            if i != len(self.contracting_path)-1:
+            if i != len(self.contracting_path) - 1:
                 blocks.append(x)
 
         for i, up in enumerate(self.upsampling_path):
-            x = up(x, blocks[-i-1])
+            x = up(x, blocks[-i - 1])
 
         del blocks
 
-        #Used for saving the activations and plotting
+        # Used for saving the activations and plotting
         if val:
             self.activation_maps.append(x)
-        
+
         if self.apply_last_layer:
-            x =  self.last_layer(x)
+            x = self.last_layer(x)
 
         return x
